@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tyta — Assistente para Motoristas de Aplicativo</title>
+  <meta name="description" content="Tyta é o assistente inteligente para motoristas do 99. Analise corridas, acompanhe seus ganhos e encontre as melhores zonas de demanda em tempo real." />
+  <meta name="google-site-verification" content="ME5TY_BQUM7jLqenlJSwPHwuLt4_76vr7Y4yqq8cbFU" />
+  <style>
+    :root {
+      --bg: #080c14;
+      --bg2: #0d1220;
+      --card: #111827;
+      --border: #1e2a3d;
+      --blue: #1a9eff;
+      --blue2: #0077cc;
+      --yellow: #f5c542;
+      --text: #e8edf5;
+      --muted: #7a8a9e;
+      --radius: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(8, 12, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 60px;
+    }
+    .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: var(--yellow); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      background: var(--blue); color: #fff; padding: 8px 20px;
+      border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--blue2); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 100px 24px 60px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,158,255,0.12) 0%, transparent 70%);
+    }
+    .hero-inner { max-width: 720px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(26,158,255,0.1); border: 1px solid rgba(26,158,255,0.3);
+      color: var(--blue); font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+    .badge-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 900; line-height: 1.15;
+      letter-spacing: -1.5px; margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--blue); }
+    .hero-sub {
+      font-size: 1.1rem; color: var(--muted); max-width: 500px;
+      margin: 0 auto 12px;
+    }
+    .compat-note {
+      display: inline-block;
+      background: rgba(245,197,66,0.1); border: 1px solid rgba(245,197,66,0.3);
+      color: var(--yellow); font-size: 0.82rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px; margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue); color: #fff;
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--blue2); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 1rem; font-weight: 600; text-decoration: none;
+      transition: border-color 0.2s, transform 0.1s;
+    }
+    .btn-secondary:hover { border-color: var(--blue); transform: translateY(-1px); }
+
+    /* COMPAT BANNER */
+    .compat-banner {
+      background: linear-gradient(135deg, rgba(245,197,66,0.08), rgba(245,197,66,0.03));
+      border: 1px solid rgba(245,197,66,0.25);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      margin: 0 auto 80px;
+      max-width: 760px;
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .compat-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .compat-banner h3 { color: var(--yellow); font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .compat-banner p { color: var(--muted); font-size: 0.9rem; }
+    .compat-banner strong { color: var(--text); }
+
+    /* SECTIONS */
+    section { padding: 80px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px;
+    }
+    .section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px; margin-top: 56px;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover { border-color: var(--blue); transform: translateY(-4px); }
+    .feature-img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
+    .feature-body { padding: 20px; }
+    .feature-tag {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 6px;
+    }
+    .feature-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .feature-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* SCREENSHOTS CAROUSEL (simple scroll) */
+    .screenshots-scroll {
+      display: flex; gap: 16px; overflow-x: auto; padding: 12px 0 20px;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+      margin-top: 40px;
+    }
+    .screenshots-scroll img {
+      height: 420px; border-radius: 12px; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 24px; text-align: center;
+    }
+    .stat-number { font-size: 2.4rem; font-weight: 900; color: var(--blue); letter-spacing: -1px; }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    /* SUPPORT */
+    #suporte { background: var(--bg2); }
+    .support-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 48px 40px;
+      max-width: 600px; margin: 48px auto 0;
+      text-align: center;
+    }
+    .support-icon { font-size: 3rem; margin-bottom: 16px; }
+    .support-card h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+    .support-card p { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+    .btn-support {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--blue); color: #fff;
+      padding: 14px 32px; border-radius: 12px;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-support:hover { background: var(--blue2); }
+    .support-note { font-size: 0.8rem; color: var(--muted); margin-top: 16px; }
+
+    /* FOOTER */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px; text-align: center;
+    }
+    .footer-logo { font-size: 1.5rem; font-weight: 900; color: var(--blue); margin-bottom: 8px; }
+    .footer-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 0.75rem; color: var(--muted); }
+
+    /* HERO RATING */
+    .hero-rating {
+      display: flex; align-items: center; gap: 8px; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 0.85rem; color: var(--muted);
+    }
+    .hero-stars { color: var(--yellow); font-size: 1rem; letter-spacing: 2px; }
+
+    /* STATS STRIP */
+    .stats-strip {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 24px;
+    }
+    .stats-strip-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px;
+    }
+    .strip-item { text-align: center; }
+    .strip-value {
+      font-size: 2rem; font-weight: 900; color: var(--yellow);
+      letter-spacing: -1px; line-height: 1;
+    }
+    .strip-label { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+    /* FAQ */
+    .faq-list { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+    details.faq-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    details.faq-item[open] { border-color: var(--blue); }
+    details.faq-item summary {
+      padding: 18px 20px; cursor: pointer;
+      font-weight: 700; font-size: 0.95rem;
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+      user-select: none;
+    }
+    details.faq-item summary::-webkit-details-marker { display: none; }
+    details.faq-item summary::after {
+      content: '+'; font-size: 1.3rem; color: var(--blue); font-weight: 300; flex-shrink: 0; margin-left: 12px;
+    }
+    details.faq-item[open] summary::after { content: '−'; }
+    .faq-answer { padding: 0 20px 18px; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .support-card { padding: 32px 20px; }
+      .compat-banner { flex-direction: column; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Tyta</div>
+  <div class="nav-links">
+    <a href="#funcionalidades">Funcionalidades</a>
+    <a href="#faq">FAQ</a>
+    <a href="#suporte">Suporte</a>
+    <a href="privacidade.html">Privacidade</a>
+    <a href="termos.html">Termos</a>
+  </div>
+  <a href="https://play.google.com/store/apps/details?id=com.tyta.app" target="_blank" class="nav-cta">Baixar grátis</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Disponível no Google Play
+    </div>
+<h1>Dirija mais.<br><span>Ganhe melhor.</span></h1>
+    <p class="hero-sub">
+      Tyta analisa cada corrida em tempo real, mostra as melhores zonas de demanda e organiza seus ganhos automaticamente.
+    </p>
+    <div class="compat-note">
+      ⚠️ Compatível atualmente apenas com o app <strong>99 Motorista</strong>
+    </div>
+    <div class="hero-actions">
+      <a href="https://play.google.com/store/apps/details?id=com.tyta.app" target="_blank" class="btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.38.21.82.2 1.2-.03l12.7-7.35-2.83-2.83L3.18 23.76zm17.34-10.68L17.38 11.5 4.38.27C4 .04 3.56.03 3.18.27L14.25 11.34l6.27 1.74zM21.5 10.6l-2.77-1.6-3.05 3.05 3.05 3.05 2.78-1.61c.78-.45.78-1.44-.01-1.89zM3.18.27c-.4.22-.64.64-.64 1.14v21.18c0 .5.24.92.64 1.14l.1.06L14.25 12.7v-.27L3.18.27z"/></svg>
+        Baixar no Google Play
+      </a>
+      <a href="#suporte" class="btn-secondary">
+        Falar com suporte
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="strip-item">
+      <div class="strip-value">Grátis</div>
+      <div class="strip-label">Download no Google Play</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-value">99</div>
+      <div class="strip-label">Integrado com 99 Motorista</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-value">Real‑time</div>
+      <div class="strip-label">Análise de corridas ao vivo</div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-value">R$/km</div>
+      <div class="strip-label">Rentabilidade em cada corrida</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPAT BANNER -->
+<div class="container">
+  <div class="compat-banner">
+    <div class="compat-icon">📱</div>
+    <div>
+      <h3>Compatibilidade atual</h3>
+      <p>
+        O Tyta funciona <strong>exclusivamente com o app 99 Motorista</strong> no momento.
+        O botão de análise de corrida, o Oráculo e os relatórios automáticos operam lendo a tela do 99 em tempo real.
+        Suporte para outros apps (Uber, inDrive, iFood) está em desenvolvimento.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="funcionalidades">
+  <div class="container">
+    <div class="section-label">Funcionalidades</div>
+    <h2 class="section-title">Tudo que você precisa<br>numa corrida</h2>
+    <p class="section-sub">Ferramentas criadas por motoristas, para motoristas — sem complicação.</p>
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <img src="img/STORE_1.png" alt="Oráculo - Zonas de alta demanda" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Oráculo</div>
+          <div class="feature-title">Zonas de Alta Demanda</div>
+          <div class="feature-desc">Veja em tempo real onde a demanda está mais alta na sua cidade. Posicione-se estrategicamente e reduza o tempo de espera.</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_2.png" alt="Análise de corrida antes de aceitar" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Análise de Corrida</div>
+          <div class="feature-title">Aceite só o que vale a pena</div>
+          <div class="feature-desc">Antes de aceitar, veja R$/km, R$/h, tempo estimado e lucro líquido. Tome a decisão certa em segundos. <br><small style="color:var(--blue)">⚡ Somente 99 Motorista</small></div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_3.png" alt="Botão rápido sobre qualquer app" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Overlay</div>
+          <div class="feature-title">Botão Rápido Sempre Visível</div>
+          <div class="feature-desc">Um botão flutuante que fica sobre o 99 Motorista. Ative ou pause a análise sem sair do app de corrida.</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_5.png" alt="Ganhos em tempo real" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Dashboard</div>
+          <div class="feature-title">Ganhos em Tempo Real</div>
+          <div class="feature-desc">Acompanhe ganhos do dia, R$/km médio e km rodados. Tudo atualizado automaticamente a cada corrida.</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_4.png" alt="Metas e odômetro" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Metas</div>
+          <div class="feature-title">Metas e Odômetro</div>
+          <div class="feature-desc">Defina suas metas financeiras mensais e acompanhe o progresso. Controle também o km rodado por veículo.</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_6.png" alt="Controle financeiro" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Financeiro</div>
+          <div class="feature-title">Faturas e Carteira</div>
+          <div class="feature-desc">Controle cartões, saldo bancário e despesas. Saiba exatamente quanto sobrou após os custos operacionais.</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <img src="img/STORE_7.png" alt="Relatórios por app e veículo" class="feature-img" loading="lazy" />
+        <div class="feature-body">
+          <div class="feature-tag">Relatórios</div>
+          <div class="feature-title">Por App e Veículo</div>
+          <div class="feature-desc">Filtre seus resultados por período, plataforma e tipo de veículo. Descubra o que rende mais para você.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section id="suporte">
+  <div class="container" style="text-align:center;">
+    <div class="section-label">Suporte</div>
+    <h2 class="section-title">Precisa de ajuda?</h2>
+    <p class="section-sub" style="margin: 0 auto;">Nossa equipe responde por e-mail. Descreva sua dúvida ou problema e retornaremos o mais rápido possível.</p>
+
+    <div class="support-card">
+      <div class="support-icon">✉️</div>
+      <h3>Fale com o suporte</h3>
+      <p>Dúvidas, problemas técnicos ou sugestões — estamos aqui para ajudar.</p>
+      <a href="mailto:tavitopstore@outlook.com?subject=Suporte%20Tyta&body=Olá,%20preciso%20de%20ajuda%20com%20o%20Tyta.%0A%0AMeu%20problema%20é:%20" class="btn-support">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        tavitopstore@outlook.com
+      </a>
+      <p class="support-note">Tempo médio de resposta: até 24 horas úteis</p>
+    </div>
+  </div>
+</section>
+
+<!-- EMPRESA -->
+<section id="empresa" style="background: var(--bg); padding: 60px 24px 40px;">
+  <div class="container">
+    <div class="section-label">Empresa</div>
+    <h2 class="section-title" style="margin-bottom: 32px;">Informações Legais</h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px;">
+        <div style="font-size:0.7rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--blue); margin-bottom:12px;">Contato</div>
+        <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+          <tr><td style="color:var(--muted); padding: 6px 0; width:36%;">E-mail</td><td><a href="mailto:tavitopstore@outlook.com" style="color:var(--blue); text-decoration:none;">tavitopstore@outlook.com</a></td></tr>
+          <tr><td style="color:var(--muted); padding: 6px 0;">Telefone</td><td><a href="https://wa.me/5531997679770" target="_blank" style="color:#25D366; text-decoration:none; display:inline-flex; align-items:center; gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>(31) 97679-770</a></td></tr>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="background: var(--bg2);">
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Perguntas frequentes</h2>
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary>O Tyta funciona com Uber, iFood ou outros apps?</summary>
+        <div class="faq-answer">
+          No momento, o Tyta é compatível <strong style="color:var(--text)">exclusivamente com o 99 Motorista</strong>. A análise de corridas em tempo real, o Oráculo e os relatórios automáticos dependem da leitura da tela do 99. Suporte a outros aplicativos (Uber, inDrive, iFood) está planejado para futuras versões.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>O Tyta é gratuito?</summary>
+        <div class="faq-answer">
+          Sim, o Tyta pode ser baixado gratuitamente na Play Store. Algumas funcionalidades avançadas podem exigir permissões específicas do Android, como sobreposição de tela (overlay) e captura de tela — tudo configurado dentro do próprio app.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Quais permissões o Tyta precisa?</summary>
+        <div class="faq-answer">
+          O Tyta precisa de permissão de <strong style="color:var(--text)">exibição sobre outros apps</strong> (para o botão flutuante) e <strong style="color:var(--text)">captura de tela</strong> (para ler os dados da corrida do 99 Motorista via OCR). Nenhum dado é enviado a servidores externos — tudo é processado localmente no seu aparelho.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Como funciona a análise de corrida?</summary>
+        <div class="faq-answer">
+          Quando uma corrida aparece no 99 Motorista, o Tyta lê os dados da tela em tempo real usando OCR (reconhecimento de texto). Em menos de um segundo, exibe no overlay: <strong style="color:var(--text)">R$/km, R$/hora, distância e lucro estimado</strong>. Assim você decide se aceita ou recusa sem pressão.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Posso usar o Tyta junto com o app 99 Motorista aberto?</summary>
+        <div class="faq-answer">
+          Sim! O Tyta roda em segundo plano como um serviço. O botão flutuante (overlay) aparece sobre o 99 Motorista sem interferir no uso normal do app. Você continua dirigindo normalmente e o Tyta trabalha silenciosamente ao fundo.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Tenho dúvidas ou problemas. Como entro em contato?</summary>
+        <div class="faq-answer">
+          Fale com o suporte pelo e-mail <a href="mailto:tavitopstore@outlook.com" style="color:var(--blue)">tavitopstore@outlook.com</a> ou pelo WhatsApp <a href="https://wa.me/5531997679770" target="_blank" style="color:#25D366">(31) 97679-770</a>. Respondemos em até 24 horas úteis.
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Tyta</div>
+  <div class="footer-sub">Assistente inteligente para motoristas do 99</div>
+  <div class="footer-links">
+    <a href="https://play.google.com/store/apps/details?id=com.tyta.app" target="_blank">Google Play</a>
+    <a href="privacidade.html">Política de Privacidade</a>
+    <a href="termos.html">Termos de Uso</a>
+    <a href="#empresa">Empresa</a>
+    <a href="mailto:tavitopstore@outlook.com">Contato</a>
+  </div>
+  <div class="footer-copy">
+    © 2026 CNPJ 65.832.808/0001-80 · Belo Horizonte, MG · Todos os direitos reservados.
+  </div>
+</footer>
+
+</body>
+</html>
